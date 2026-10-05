@@ -137,6 +137,24 @@
       text-transform: uppercase;
     }
 
+    /* Poem Display Underneath EP Score */
+    .poem-output {
+      margin-top: 0.75rem;
+      padding: 0.6rem 1rem;
+      background: #fdf2f8;
+      border: 1px dashed var(--accent-pink);
+      border-radius: 12px;
+      font-style: italic;
+      color: var(--accent-purple);
+      font-weight: 600;
+      font-size: 0.95rem;
+      min-height: 2.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: break-word;
+    }
+
     /* Actions */
     .action-btn {
       width: 100%;
@@ -218,6 +236,75 @@
       border-radius: 8px;
     }
 
+    /* Poem Builder Component */
+    .poem-builder-card {
+      display: none;
+      text-align: left;
+    }
+
+    .drag-zone {
+      min-height: 55px;
+      border: 2px dashed var(--accent-purple);
+      background: #faf5ff;
+      border-radius: 12px;
+      padding: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .drag-zone-placeholder {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-style: italic;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+
+    .word-tile {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-main);
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      transition: transform 0.1s, background-color 0.2s, border-color 0.2s;
+    }
+
+    .word-tile:hover {
+      border-color: var(--accent-pink);
+      background: #fdf2f8;
+    }
+
+    .word-tile:active {
+      cursor: grabbing;
+    }
+
+    .starter-word {
+      background: #f3e8ff;
+      border-color: var(--accent-purple);
+      color: var(--accent-purple);
+    }
+
     /* Leaderboard */
     .leaderboard-table {
       width: 100%;
@@ -285,9 +372,24 @@
       <div>
         <div class="ep-badge" id="epDisplay">0 EP</div>
         <div class="ep-label">Your Roll EP</div>
+        <div class="poem-output" id="poemOutput" style="display: none;"></div>
       </div>
 
       <button class="action-btn" id="rollBtn" onclick="performMoraleRoll()">ROLL</button>
+    </div>
+
+    <!-- Drag and Drop Poem Creator Card -->
+    <div class="card poem-builder-card" id="poemBuilderCard">
+      <div class="section-title">write that poem, queen!</div>
+      
+      <div class="drag-zone" id="poemCanvas" ondragover="allowDrop(event)" ondrop="dropToCanvas(event)">
+        <span class="drag-zone-placeholder" id="canvasPlaceholder">Drag words here to construct your poem...</span>
+      </div>
+
+      <div class="section-title" style="margin-bottom: 0.5rem;">Word Bank</div>
+      <div class="word-bank" id="wordBank" ondragover="allowDrop(event)" ondrop="dropToBank(event)">
+        <!-- Dynamic Word Tiles -->
+      </div>
     </div>
 
     <!-- Badges Earned Section -->
@@ -422,7 +524,7 @@
 
       // 1. Repdigit Check
       if (new Set(digits).size === 1) {
-        badges.push({ name: "JACKPOT SIX-OF-A-KIND", icon: "🎰", desc: "Every single digit is identical! ", ep: 10000, rarity: "SINGULAR" });
+        badges.push({ name: "JACKPOT SIX-OF-A-KIND", icon: "🎰", desc: "Every single digit is identical! ive never seen such a thing! ", ep: 10000, rarity: "SINGULAR" });
       }
 
       // 2. Cultural / Meme Badges
@@ -441,7 +543,7 @@
 
       // 3. Palindrome Check
       if (numStr === digits.slice().reverse().join('')) {
-        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome.", ep: 3500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome. When i look in the mirror i see a perfect guy.", ep: 3500, rarity: "EXCEPTIONAL" });
       }
 
       // 4. Count frequencies
@@ -451,27 +553,27 @@
 
       // 5. Quadruples Check
       if (freqValues.includes(4)) {
-        badges.push({ name: "QUAD SQUAD", icon: "⚡", desc: "Contains four matching digits.", ep: 3200, rarity: "RARE" });
+        badges.push({ name: "4 of em", icon: "⚡", desc: "Contains four matching digits. I'd like to do a matching halloween costume with you. ", ep: 3200, rarity: "RARE" });
       }
 
       // 6. Triple Double Pairs (e.g. 112233)
       if (freqValues.filter(c => c === 2).length === 3) {
-        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "Three matching pairs in one roll!", ep: 3000, rarity: "RARE" });
+        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "Three matching pairs in one roll! Its quite simple, really, ", ep: 3000, rarity: "RARE" });
       }
 
       // 7. Double Triplet / Full House (e.g. 333888)
       if (freqValues.filter(c => c === 3).length === 2) {
-        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits.", ep: 4500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits. thats 6 total  i tink", ep: 4500, rarity: "EXCEPTIONAL" });
       }
 
       // 8. Alternating Waves (e.g. 898989)
       if (digits[0] === digits[2] && digits[2] === digits[4] && digits[1] === digits[3] && digits[3] === digits[5] && digits[0] !== digits[1]) {
-        badges.push({ name: "SYMMETRICAL WAVE", icon: "", desc: "Perfectly alternating digit pattern.", ep: 4800, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "SYMMETRICAL WAVE", icon: "", desc: "Perfectly alternating digit pattern. Im also an alternative goth woman. Ok i not but maybe one day...", ep: 4800, rarity: "EXCEPTIONAL" });
       }
 
       // 9. Repeating Half Sequence (e.g., 789789)
       if (numStr.slice(0, 3) === numStr.slice(3, 6) && new Set(digits).size > 1) {
-        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly.", ep: 3800, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly. the first half exactly repeats The second half ", ep: 3800, rarity: "EXCEPTIONAL" });
       }
 
       // 10. Perfect Ascension / Descension
@@ -481,26 +583,26 @@
         if (nums[i+1] !== nums[i] - 1) isDesc = false;
       }
       if (isAsc) {
-        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order. lik e on e two three four five", ep: 7500, rarity: "EXTREME" });
       } else if (isDesc) {
-        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order. like five four three tow one", ep: 7500, rarity: "EXTREME" });
       }
 
       // 11. Lucky Sevens Count
       const countSevens = counts['7'] || 0;
       if (countSevens >= 3) {
-        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!`, ep: countSevens * 1200, rarity: "RARE" });
+        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s! im only seven!`, ep: countSevens * 1200, rarity: "RARE" });
       }
 
       // 12. Infinite Eights Count
       const countEights = counts['8'] || 0;
       if (countEights >= 3) {
-        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s!`, ep: countEights * 1300, rarity: "RARE" });
+        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s! i'm only 8 years old!`, ep: countEights * 1300, rarity: "RARE" });
       }
 
       // 13. Equilibrium (Outer match)
       if (digits[0] === digits[5]) {
-        badges.push({ name: "EQUILIBRIUM", icon: "", desc: "First and last digits match.", ep: 1200, rarity: "RARE" });
+        badges.push({ name: "EQUILIBRIUM", icon: "", desc: "First and last digits match. ", ep: 1200, rarity: "RARE" });
       }
 
       // 14. Heavy Weight & Max Power
@@ -512,7 +614,7 @@
 
       // 15. Prime Sum Bonus
       if (isPrime(digitSum)) {
-        badges.push({ name: "PRIME HARMONY", icon: "", desc: `Digit total of ${digitSum} is a prime number! Yay!`, ep: 1600, rarity: "RARE" });
+        badges.push({ name: "PRIME HARMONY", icon: "", desc: `Digit total of ${digitSum} is a prime number!  Yay!`, ep: 1600, rarity: "RARE" });
       }
 
       // 16. Double Sandwich
@@ -551,6 +653,94 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    /* Drag & Drop Poem Builder Logic */
+    let draggedTileId = null;
+
+    function createWordTile(text, isStarter = false) {
+      const tile = document.createElement('span');
+      tile.className = 'word-tile' + (isStarter ? ' starter-word' : '');
+      tile.innerText = text;
+      tile.id = 'tile-' + Math.random().toString(36).substr(2, 9);
+      tile.draggable = true;
+      tile.ondragstart = (e) => {
+        draggedTileId = tile.id;
+        e.dataTransfer.setData('text/plain', tile.id);
+      };
+      return tile;
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function dropToCanvas(ev) {
+      ev.preventDefault();
+      const tile = document.getElementById(draggedTileId);
+      if (!tile) return;
+
+      const canvas = document.getElementById('poemCanvas');
+      canvas.appendChild(tile);
+      updatePoemDisplay();
+    }
+
+    function dropToBank(ev) {
+      ev.preventDefault();
+      const tile = document.getElementById(draggedTileId);
+      if (!tile) return;
+
+      const bank = document.getElementById('wordBank');
+      bank.appendChild(tile);
+      updatePoemDisplay();
+    }
+
+    function updatePoemDisplay() {
+      const canvas = document.getElementById('poemCanvas');
+      const placeholder = document.getElementById('canvasPlaceholder');
+      const tiles = canvas.querySelectorAll('.word-tile');
+      const poemOutput = document.getElementById('poemOutput');
+
+      if (tiles.length === 0) {
+        placeholder.style.display = 'block';
+        poemOutput.style.display = 'none';
+        poemOutput.innerText = '';
+      } else {
+        placeholder.style.display = 'none';
+        const poemText = Array.from(tiles).map(t => t.innerText).join(' ');
+        poemOutput.innerText = `"${poemText}"`;
+        poemOutput.style.display = 'flex';
+      }
+    }
+
+    function buildPoemWordBank(badges) {
+      const wordBank = document.getElementById('wordBank');
+      const canvas = document.getElementById('poemCanvas');
+      const poemOutput = document.getElementById('poemOutput');
+      
+      wordBank.innerHTML = '';
+      canvas.innerHTML = '<span class="drag-zone-placeholder" id="canvasPlaceholder">Drag words here to construct your poem...</span>';
+      poemOutput.innerText = '';
+      poemOutput.style.display = 'none';
+
+      // Required initial starter phrase
+      const starterWords = ["I", "am", "a", "winner.", "I", "am", "so", "good", "at", "this", "game."];
+      starterWords.forEach(word => {
+        wordBank.appendChild(createWordTile(word, true));
+      });
+
+      // Extract words from badges & descriptions
+      const rawText = badges.map(b => `${b.name} ${b.desc}`).join(' ');
+      const extractedWords = rawText.match(/[a-zA-Z0-9!?.']+/g) || [];
+      
+      // Filter out duplicate extracted badge words
+      const uniqueBadgeWords = [...new Set(extractedWords)];
+
+      uniqueBadgeWords.forEach(word => {
+        wordBank.appendChild(createWordTile(word, false));
+      });
+
+      document.getElementById('poemBuilderCard').style.display = 'block';
     }
 
     function performMoraleRoll() {
@@ -607,6 +797,9 @@
             `;
             badgeList.appendChild(card);
           });
+
+          // Populate Drag and Drop Poem Menu
+          buildPoemWordBank(badges);
 
           // Insert or Update User on Leaderboard
           const existingUserIdx = leaderboardData.findIndex(item => item.isUser);
