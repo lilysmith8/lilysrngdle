@@ -547,7 +547,7 @@
       }
 
       if (numStr === digits.slice().reverse().join('')) {
-        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome.", ep: 3500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome. When i look in the mirror i see a perfect guy.", ep: 3500, rarity: "EXCEPTIONAL" });
       }
 
       const counts = {};
@@ -555,15 +555,15 @@
       const freqValues = Object.values(counts);
 
       if (freqValues.includes(4)) {
-        badges.push({ name: "QUAD SQUAD", icon: "⚡", desc: "Contains four matching digits.", ep: 3200, rarity: "RARE" });
+        badges.push({ name: "4 of em", icon: "", desc: "Contains four matching digits. I'd like to do a matching halloween costume with you.", ep: 3200, rarity: "RARE" });
       }
 
       if (freqValues.filter(c => c === 2).length === 3) {
-        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "Three matching pairs in one roll!", ep: 3000, rarity: "RARE" });
+        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "hree matching pairs in one roll! Its quite simple, really, ", ep: 3000, rarity: "RARE" });
       }
 
       if (freqValues.filter(c => c === 3).length === 2) {
-        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits.", ep: 4500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits. thats 6 total  i tink.", ep: 4500, rarity: "EXCEPTIONAL" });
       }
 
       if (digits[0] === digits[2] && digits[2] === digits[4] && digits[1] === digits[3] && digits[3] === digits[5] && digits[0] !== digits[1]) {
@@ -571,7 +571,7 @@
       }
 
       if (numStr.slice(0, 3) === numStr.slice(3, 6) && new Set(digits).size > 1) {
-        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly.", ep: 3800, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly. the first half exactly repeats The second half ", ep: 3800, rarity: "EXCEPTIONAL" });
       }
 
       let isAsc = true, isDesc = true;
@@ -580,19 +580,19 @@
         if (nums[i+1] !== nums[i] - 1) isDesc = false;
       }
       if (isAsc) {
-        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order. lik e on e two three four five", ep: 7500, rarity: "EXTREME" });
       } else if (isDesc) {
-        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order. like five four three tow one", ep: 7500, rarity: "EXTREME" });
       }
 
       const countSevens = counts['7'] || 0;
       if (countSevens >= 3) {
-        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!`, ep: countSevens * 1200, rarity: "RARE" });
+        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!im only seven!`, ep: countSevens * 1200, rarity: "RARE" });
       }
 
       const countEights = counts['8'] || 0;
       if (countEights >= 3) {
-        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s!`, ep: countEights * 1300, rarity: "RARE" });
+        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s! im only 8 years old!`, ep: countEights * 1300, rarity: "RARE" });
       }
 
       if (digits[0] === digits[5]) {
