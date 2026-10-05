@@ -253,6 +253,7 @@
       gap: 0.4rem;
       align-items: center;
       margin-bottom: 1rem;
+      touch-action: none;
     }
 
     .drag-zone-placeholder {
@@ -280,12 +281,14 @@
       background: white;
       border: 1px solid #cbd5e1;
       color: var(--text-main);
-      padding: 0.3rem 0.6rem;
+      padding: 0.35rem 0.65rem;
       border-radius: 8px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: grab;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
       transition: transform 0.1s, background-color 0.2s, border-color 0.2s;
     }
@@ -299,10 +302,24 @@
       cursor: grabbing;
     }
 
+    .word-tile.dragging {
+      opacity: 0.7;
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
     .starter-word {
       background: #f3e8ff;
       border-color: var(--accent-purple);
       color: var(--accent-purple);
+    }
+
+    .poem-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
     }
 
     /* Leaderboard */
@@ -380,10 +397,11 @@
 
     <!-- Drag and Drop Poem Creator Card -->
     <div class="card poem-builder-card" id="poemBuilderCard">
-      <div class="section-title">write that poem, queen!</div>
+      <div class="section-title">Compose Your Victory Poem</div>
+      <div class="poem-hint">Tap or drag words into the canvas below:</div>
       
       <div class="drag-zone" id="poemCanvas" ondragover="allowDrop(event)" ondrop="dropToCanvas(event)">
-        <span class="drag-zone-placeholder" id="canvasPlaceholder">Drag words here to construct your poem...</span>
+        <span class="drag-zone-placeholder" id="canvasPlaceholder">Drag or tap words here to construct your poem...</span>
       </div>
 
       <div class="section-title" style="margin-bottom: 0.5rem;">Word Bank</div>
@@ -451,35 +469,29 @@
       return true;
     }
 
-    // High-Morale High-Score Generators Only
     function generateMoraleNumber() {
       const generators = [
-        // 1. Pure Repdigits (e.g. 777777, 888888, 999999)
         () => {
           const highDigits = [7, 8, 9];
           const d = highDigits[Math.floor(Math.random() * highDigits.length)];
           return String(d).repeat(6);
         },
-        // 2. High Palindromes (e.g. 987789, 891198)
         () => {
           const a = [7, 8, 9][Math.floor(Math.random() * 3)];
           const b = [6, 7, 8, 9][Math.floor(Math.random() * 4)];
           const c = Math.floor(Math.random() * 10);
           return `${a}${b}${c}${c}${b}${a}`;
         },
-        // 3. Cultural & Meme Elite High Scores
         () => {
           const memes = ["001337", "000420", "069696", "080085", "001738", "080808", "420690"];
           return memes[Math.floor(Math.random() * memes.length)];
         },
-        // 4. Quadruple Stacks + Pair (e.g. 999988, 888899)
         () => {
           const d1 = [7, 8, 9][Math.floor(Math.random() * 3)];
           let d2 = [0, 1, 7, 8, 9][Math.floor(Math.random() * 5)];
           while (d1 === d2) d2 = Math.floor(Math.random() * 10);
           return `${d1}${d1}${d1}${d1}${d2}${d2}`;
         },
-        // 5. Perfect Ascension or Descent (123456, 654321, 234567, 765432)
         () => {
           if (Math.random() > 0.5) {
             const start = Math.floor(Math.random() * 4) + 1;
@@ -489,21 +501,18 @@
             return Array.from({length: 6}, (_, i) => start - i).join('');
           }
         },
-        // 6. Double Triplet Full House (e.g. 333888, 999111, 777999)
         () => {
           const d1 = [3, 7, 8, 9][Math.floor(Math.random() * 4)];
           let d2 = [1, 7, 8, 9][Math.floor(Math.random() * 4)];
           while (d1 === d2) d2 = Math.floor(Math.random() * 10);
           return `${d1}${d1}${d1}${d2}${d2}${d2}`;
         },
-        // 7. Alternating Waves (e.g. 898989, 979797, 787878)
         () => {
           const d1 = [7, 8, 9][Math.floor(Math.random() * 3)];
           let d2 = [0, 7, 8, 9][Math.floor(Math.random() * 4)];
           while (d1 === d2) d2 = Math.floor(Math.random() * 10);
           return `${d1}${d2}${d1}${d2}${d1}${d2}`;
         },
-        // 8. Bookend Double Sandwich (e.g. 990099, 881188)
         () => {
           const d1 = [8, 9][Math.floor(Math.random() * 2)];
           const d2 = [0, 1][Math.floor(Math.random() * 2)];
@@ -511,23 +520,19 @@
         }
       ];
 
-      const chosenGen = generators[Math.floor(Math.random() * generators.length)];
-      return chosenGen();
+      return generators[Math.floor(Math.random() * generators.length)]();
     }
 
-    // Comprehensive Badge Evaluator Engine
     function evaluateBadges(numStr) {
       const badges = [];
       const digits = numStr.split('');
       const nums = digits.map(Number);
       const digitSum = nums.reduce((a, b) => a + b, 0);
 
-      // 1. Repdigit Check
       if (new Set(digits).size === 1) {
-        badges.push({ name: "JACKPOT SIX-OF-A-KIND", icon: "🎰", desc: "Every single digit is identical! ive never seen such a thing! ", ep: 10000, rarity: "SINGULAR" });
+        badges.push({ name: "JACKPOT SIX-OF-A-KIND", icon: "🎰", desc: "Every single digit is identical! ", ep: 10000, rarity: "SINGULAR" });
       }
 
-      // 2. Cultural / Meme Badges
       if (numStr === "001337") {
         badges.push({ name: "LEET ", icon: "💻", desc: "1337 : Okay Epic Ass", ep: 6500, rarity: "EXTREME" });
       }
@@ -541,88 +546,73 @@
         badges.push({ name: "CLASSIC CALCULATOR", icon: "", desc: " 8008 . This is my password on 1 website. not saying which...", ep: 5000, rarity: "EXCEPTIONAL" });
       }
 
-      // 3. Palindrome Check
       if (numStr === digits.slice().reverse().join('')) {
-        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome. When i look in the mirror i see a perfect guy.", ep: 3500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "MIRROR REFLECTION", icon: "🪞", desc: "The digits form a perfect palindrome.", ep: 3500, rarity: "EXCEPTIONAL" });
       }
 
-      // 4. Count frequencies
       const counts = {};
       digits.forEach(d => counts[d] = (counts[d] || 0) + 1);
       const freqValues = Object.values(counts);
 
-      // 5. Quadruples Check
       if (freqValues.includes(4)) {
-        badges.push({ name: "4 of em", icon: "⚡", desc: "Contains four matching digits. I'd like to do a matching halloween costume with you. ", ep: 3200, rarity: "RARE" });
+        badges.push({ name: "QUAD SQUAD", icon: "⚡", desc: "Contains four matching digits.", ep: 3200, rarity: "RARE" });
       }
 
-      // 6. Triple Double Pairs (e.g. 112233)
       if (freqValues.filter(c => c === 2).length === 3) {
-        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "Three matching pairs in one roll! Its quite simple, really, ", ep: 3000, rarity: "RARE" });
+        badges.push({ name: "TRIPLE DOUBLE", icon: "👯", desc: "Three matching pairs in one roll!", ep: 3000, rarity: "RARE" });
       }
 
-      // 7. Double Triplet / Full House (e.g. 333888)
       if (freqValues.filter(c => c === 3).length === 2) {
-        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits. thats 6 total  i tink", ep: 4500, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "DOUBLE TRIPLET", icon: "", desc: "Two distinct sets of three matching digits.", ep: 4500, rarity: "EXCEPTIONAL" });
       }
 
-      // 8. Alternating Waves (e.g. 898989)
       if (digits[0] === digits[2] && digits[2] === digits[4] && digits[1] === digits[3] && digits[3] === digits[5] && digits[0] !== digits[1]) {
-        badges.push({ name: "SYMMETRICAL WAVE", icon: "", desc: "Perfectly alternating digit pattern. Im also an alternative goth woman. Ok i not but maybe one day...", ep: 4800, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "SYMMETRICAL WAVE", icon: "", desc: "Perfectly alternating digit pattern.", ep: 4800, rarity: "EXCEPTIONAL" });
       }
 
-      // 9. Repeating Half Sequence (e.g., 789789)
       if (numStr.slice(0, 3) === numStr.slice(3, 6) && new Set(digits).size > 1) {
-        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly. the first half exactly repeats The second half ", ep: 3800, rarity: "EXCEPTIONAL" });
+        badges.push({ name: "ECHO CHAMBER", icon: "", desc: "The second half repeats the first half exactly.", ep: 3800, rarity: "EXCEPTIONAL" });
       }
 
-      // 10. Perfect Ascension / Descension
       let isAsc = true, isDesc = true;
       for (let i = 0; i < digits.length - 1; i++) {
         if (nums[i+1] !== nums[i] + 1) isAsc = false;
         if (nums[i+1] !== nums[i] - 1) isDesc = false;
       }
       if (isAsc) {
-        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order. lik e on e two three four five", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT ASCENSION", icon: "🚀", desc: "Digits ascend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
       } else if (isDesc) {
-        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order. like five four three tow one", ep: 7500, rarity: "EXTREME" });
+        badges.push({ name: "PERFECT DESCENT", icon: "", desc: "Digits descend in perfect sequential order.", ep: 7500, rarity: "EXTREME" });
       }
 
-      // 11. Lucky Sevens Count
       const countSevens = counts['7'] || 0;
       if (countSevens >= 3) {
-        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s! im only seven!`, ep: countSevens * 1200, rarity: "RARE" });
+        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!`, ep: countSevens * 1200, rarity: "RARE" });
       }
 
-      // 12. Infinite Eights Count
       const countEights = counts['8'] || 0;
       if (countEights >= 3) {
-        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s! i'm only 8 years old!`, ep: countEights * 1300, rarity: "RARE" });
+        badges.push({ name: "INFINITE FORTUNE", icon: "♾️", desc: `Contains ${countEights} lucky 8s!`, ep: countEights * 1300, rarity: "RARE" });
       }
 
-      // 13. Equilibrium (Outer match)
       if (digits[0] === digits[5]) {
-        badges.push({ name: "EQUILIBRIUM", icon: "", desc: "First and last digits match. ", ep: 1200, rarity: "RARE" });
+        badges.push({ name: "EQUILIBRIUM", icon: "", desc: "First and last digits match.", ep: 1200, rarity: "RARE" });
       }
 
-      // 14. Heavy Weight & Max Power
       if (digitSum >= 50) {
         badges.push({ name: "MAX POWER ROLL", icon: "💥", desc: `Incredible digit sum of ${digitSum}! I love you. `, ep: 3500, rarity: "EXCEPTIONAL" });
       } else if (digitSum >= 40) {
         badges.push({ name: "HEAVYWEIGHT ROLL", icon: "🏋️", desc: `Huge digit sum of ${digitSum}! Okay fuck`, ep: 2200, rarity: "RARE" });
       }
 
-      // 15. Prime Sum Bonus
       if (isPrime(digitSum)) {
-        badges.push({ name: "PRIME HARMONY", icon: "", desc: `Digit total of ${digitSum} is a prime number!  Yay!`, ep: 1600, rarity: "RARE" });
+        badges.push({ name: "PRIME HARMONY", icon: "", desc: `Digit total of ${digitSum} is a prime number! Yay!`, ep: 1600, rarity: "RARE" });
       }
 
-      // 16. Double Sandwich
       if (digits[0] === digits[1] && digits[4] === digits[5] && digits[0] === digits[5] && digits[0] !== digits[2]) {
         badges.push({ name: "DOUBLE SANDWICH", icon: "🥪", desc: "Matching double ends framing the middle. Thats pretty special", ep: 2400, rarity: "RARE" });
       }
 
-      // 17. Morale Boost Guaranteed Fallback
       badges.push({ name: "LILY'S BLESSING", icon: "", desc: "dont wory i got u", ep: 15000, rarity: "RARE" });
 
       return badges;
@@ -639,7 +629,6 @@
       const tbody = document.getElementById('leaderboardBody');
       tbody.innerHTML = '';
       
-      // Sort leaderboard by EP descending
       leaderboardData.sort((a, b) => b.ep - a.ep);
 
       leaderboardData.forEach((entry, idx) => {
@@ -655,7 +644,7 @@
       });
     }
 
-    /* Drag & Drop Poem Builder Logic */
+    /* Drag & Drop + Touch & Tap Logic */
     let draggedTileId = null;
 
     function createWordTile(text, isStarter = false) {
@@ -664,10 +653,82 @@
       tile.innerText = text;
       tile.id = 'tile-' + Math.random().toString(36).substr(2, 9);
       tile.draggable = true;
+
+      // Mouse drag handlers
       tile.ondragstart = (e) => {
         draggedTileId = tile.id;
         e.dataTransfer.setData('text/plain', tile.id);
       };
+
+      // Tap-to-move feature for mobile & quick desktop use
+      tile.onclick = () => {
+        const canvas = document.getElementById('poemCanvas');
+        const bank = document.getElementById('wordBank');
+        
+        if (tile.parentElement === canvas) {
+          bank.appendChild(tile);
+        } else {
+          canvas.appendChild(tile);
+        }
+        updatePoemDisplay();
+      };
+
+      // Touch Drag Support for Mobile
+      let touchMoved = false;
+
+      tile.ontouchstart = (e) => {
+        touchMoved = false;
+        const touch = e.touches[0];
+        draggedTileId = tile.id;
+
+        // Clone tile for dragging visual feedback
+        const clone = tile.cloneNode(true);
+        clone.classList.add('dragging');
+        clone.id = 'active-touch-drag';
+        document.body.appendChild(clone);
+
+        const moveAt = (pageX, pageY) => {
+          clone.style.left = pageX - clone.offsetWidth / 2 + 'px';
+          clone.style.top = pageY - clone.offsetHeight / 2 + 'px';
+        };
+
+        moveAt(touch.pageX, touch.pageY);
+
+        const onTouchMove = (moveEv) => {
+          touchMoved = true;
+          const moveTouch = moveEv.touches[0];
+          moveAt(moveTouch.pageX, moveTouch.pageY);
+        };
+
+        const onTouchEnd = (endEv) => {
+          const activeClone = document.getElementById('active-touch-drag');
+          if (activeClone) activeClone.remove();
+
+          document.removeEventListener('touchmove', onTouchMove);
+          document.removeEventListener('touchend', onTouchEnd);
+
+          if (touchMoved) {
+            const lastTouch = endEv.changedTouches[0];
+            const targetEl = document.elementFromPoint(lastTouch.clientX, lastTouch.clientY);
+            
+            if (targetEl) {
+              const canvas = document.getElementById('poemCanvas');
+              const bank = document.getElementById('wordBank');
+
+              if (canvas.contains(targetEl) || targetEl === canvas) {
+                canvas.appendChild(tile);
+              } else if (bank.contains(targetEl) || targetEl === bank) {
+                bank.appendChild(tile);
+              }
+              updatePoemDisplay();
+            }
+          }
+        };
+
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchend', onTouchEnd);
+      };
+
       return tile;
     }
 
@@ -719,7 +780,7 @@
       const poemOutput = document.getElementById('poemOutput');
       
       wordBank.innerHTML = '';
-      canvas.innerHTML = '<span class="drag-zone-placeholder" id="canvasPlaceholder">Drag words here to construct your poem...</span>';
+      canvas.innerHTML = '<span class="drag-zone-placeholder" id="canvasPlaceholder">Drag or tap words here to construct your poem...</span>';
       poemOutput.innerText = '';
       poemOutput.style.display = 'none';
 
@@ -733,7 +794,6 @@
       const rawText = badges.map(b => `${b.name} ${b.desc}`).join(' ');
       const extractedWords = rawText.match(/[a-zA-Z0-9!?.']+/g) || [];
       
-      // Filter out duplicate extracted badge words
       const uniqueBadgeWords = [...new Set(extractedWords)];
 
       uniqueBadgeWords.forEach(word => {
@@ -757,7 +817,6 @@
       const targetNum = generateMoraleNumber();
       let ticks = 0;
 
-      // Slot machine animation effect
       const interval = setInterval(() => {
         digitDisplay.innerText = Math.floor(100000 + Math.random() * 900000);
         ticks++;
@@ -766,12 +825,10 @@
           clearInterval(interval);
           digitDisplay.innerText = targetNum;
 
-          // Process Results
           const badges = evaluateBadges(targetNum);
           const totalEP = badges.reduce((acc, b) => acc + b.ep, 0);
           const rarity = calculateRarity(totalEP);
 
-          // Update UI
           document.getElementById('epDisplay').innerText = `${totalEP.toLocaleString()} EP`;
           
           const pill = document.getElementById('rarityPill');
@@ -782,7 +839,6 @@
           document.getElementById('percentileDisplay').innerText = rarity.percentile;
           document.getElementById('badgeCount').innerText = badges.length;
 
-          // Render Badges Breakdown
           const badgeList = document.getElementById('badgeList');
           badgeList.innerHTML = '';
           badges.forEach(b => {
@@ -798,10 +854,8 @@
             badgeList.appendChild(card);
           });
 
-          // Populate Drag and Drop Poem Menu
           buildPoemWordBank(badges);
 
-          // Insert or Update User on Leaderboard
           const existingUserIdx = leaderboardData.findIndex(item => item.isUser);
           const userEntry = { name: "You ", roll: targetNum, ep: totalEP, isUser: true };
 
@@ -820,7 +874,6 @@
       }, 50);
     }
 
-    // Initialize Leaderboard on Load
     renderLeaderboard();
   </script>
 </body>
