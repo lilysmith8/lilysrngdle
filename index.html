@@ -334,7 +334,8 @@
       { rank: 4, name: "cheesyFist ", roll: "900009", ep: 9400 },
       { rank: 5, name: "logcabin_34 ", roll: "456654", ep: 8100 },
       { rank: 6, name: "creamcheeseFist", roll: "333888", ep: 6800 },
-      { rank: 7, name: "george_highscore ", roll: "112233", ep: 5500 }
+      { rank: 7, name: "george_highscore ", roll: "112233", ep: 5500 },
+      { rank: "-∞", name: " Mwojdzo Tabada ", roll: "", ep: -Infinity }
     ];
 
     let isRolling = false;
@@ -488,7 +489,7 @@
       // 11. Lucky Sevens Count
       const countSevens = counts['7'] || 0;
       if (countSevens >= 3) {
-        badges.push({ name: "LUCKY MORALE CHARM", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!`, ep: countSevens * 1200, rarity: "RARE" });
+        badges.push({ name: "LUCKY Boy...", icon: "🍀", desc: `Contains ${countSevens} lucky 7s!`, ep: countSevens * 1200, rarity: "RARE" });
       }
 
       // 12. Infinite Eights Count
@@ -543,7 +544,7 @@
         const tr = document.createElement('tr');
         if (entry.isUser) tr.classList.add('player-row-user');
         tr.innerHTML = `
-          <td class="rank-col">${idx + 1}</td>
+          <td class="rank-col">${entry.rank ?? (idx + 1)}</td>
           <td class="player-col">${entry.name}</td>
           <td><code>${entry.roll}</code></td>
           <td class="score-col">${entry.ep.toLocaleString()}</td>
@@ -609,7 +610,7 @@
 
           // Insert or Update User on Leaderboard
           const existingUserIdx = leaderboardData.findIndex(item => item.isUser);
-          const userEntry = { rank: 0, name: "You ", roll: targetNum, ep: totalEP, isUser: true };
+          const userEntry = { name: "You ", roll: targetNum, ep: totalEP, isUser: true };
 
           if (existingUserIdx !== -1) {
             leaderboardData[existingUserIdx] = userEntry;
